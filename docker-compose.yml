@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  data_service:
+    build: ./container_services/data_service
+    ports:
+      - "${DATA_PORT:-5003}:5003"
+    environment:
+      - PORT=5003
+    networks:
+      - campus-net
+
+  workflow_service:
+    build: ./container_services/workflow_service
+    ports:
+      - "${WORKFLOW_PORT:-5002}:5002"
+    environment:
+      - PORT=5002
+      - DATA_SERVICE_URL=http://data_service:5003
+      - ALIYUN_REGION=${ALIYUN_REGION:-cn-hangzhou}
+      - ALIYUN_ACCESS_KEY_ID=${ALIYUN_ACCESS_KEY_ID}
+      - ALIYUN_ACCESS_KEY_SECRET=${ALIYUN_ACCESS_KEY_SECRET}
+      - FC_SERVICE_NAME=${FC_SERVICE_NAME:-CampusBuzzService}
+      - FC_FUNCTION_NAME=${FC_FUNCTION_NAME:-submission-event}
+    depends_on:
+      - data_service
+    networks:
+      - campus-net
+
+  presentation_service:
+    build: ./container_services/presentation_service
+    ports:
+      - "${PRESENTATION_PORT:-5001}:5001"
+    environment:
+      - PORT=5001
+    depends_on:
+      - workflow_service
+    networks:
+      - campus-net
+
+networks:
+  campus-net:
+    driver: bridge

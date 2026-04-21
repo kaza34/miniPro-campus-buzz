@@ -1,0 +1,1 @@
+DATA_SERVICE_URL = "http://data_service:5003"

@@ -1,0 +1,198 @@
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Campus Buzz - Submit Event</title>-->
+<!--    <style>-->
+<!--        body { font-family: Arial, sans-serif; margin: 40px; }-->
+<!--        .container { max-width: 500px; }-->
+<!--        input, textarea { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }-->
+<!--        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }-->
+<!--        button:hover { background: #45a049; }-->
+<!--        #result { margin-top: 20px; border: 1px solid #ccc; padding: 15px; display: none; }-->
+<!--        .status { font-weight: bold; }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container">-->
+<!--        <h1>Campus Buzz</h1>-->
+<!--        <p>Submit a campus event. The system will automatically review and classify it.</p>-->
+<!--        <form id="eventForm">-->
+<!--            <input type="text" id="title" placeholder="Event Title *" required>-->
+<!--            <textarea id="description" placeholder="Description (at least 40 characters) *" rows="4" required></textarea>-->
+<!--            <input type="text" id="location" placeholder="Location *" required>-->
+<!--            <input type="text" id="date" placeholder="Date (YYYY-MM-DD) *" required>-->
+<!--            <input type="text" id="organizer" placeholder="Organizer *" required>-->
+<!--            <button type="submit">Submit for Review</button>-->
+<!--        </form>-->
+
+<!--        <div id="result">-->
+<!--            <h3>Review Result</h3>-->
+<!--            <p><span class="status">Status:</span> <span id="status"></span></p>-->
+<!--            <p><span class="status">Category:</span> <span id="category"></span></p>-->
+<!--            <p><span class="status">Priority:</span> <span id="priority"></span></p>-->
+<!--            <p><span class="status">Note:</span> <span id="note"></span></p>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        // Determine workflow URL dynamically – no hardcoded address-->
+<!--        let workflowUrl = "{{ workflow_url }}";-->
+<!--        if (!workflowUrl) {-->
+<!--            const protocol = window.location.protocol;-->
+<!--            const hostname = window.location.hostname;-->
+<!--            workflowUrl = `${protocol}//${hostname}:5002`;-->
+<!--        }-->
+<!--        console.log('Workflow URL:', workflowUrl);-->
+
+<!--        document.getElementById('eventForm').addEventListener('submit', async (e) => {-->
+<!--            e.preventDefault();-->
+
+<!--            const formData = {-->
+<!--                title: document.getElementById('title').value,-->
+<!--                description: document.getElementById('description').value,-->
+<!--                location: document.getElementById('location').value,-->
+<!--                date: document.getElementById('date').value,-->
+<!--                organizer: document.getElementById('organizer').value-->
+<!--            };-->
+
+<!--            try {-->
+<!--                const submitResp = await fetch(workflowUrl + '/submit', {-->
+<!--                    method: 'POST',-->
+<!--                    headers: {'Content-Type': 'application/json'},-->
+<!--                    body: JSON.stringify(formData)-->
+<!--                });-->
+<!--                const submitData = await submitResp.json();-->
+<!--                const eventId = submitData.event_id;-->
+
+<!--                const resultDiv = document.getElementById('result');-->
+<!--                resultDiv.style.display = 'block';-->
+<!--                document.getElementById('status').innerText = 'Processing...';-->
+<!--                document.getElementById('category').innerText = '—';-->
+<!--                document.getElementById('priority').innerText = '—';-->
+<!--                document.getElementById('note').innerText = '—';-->
+
+<!--                const pollInterval = setInterval(async () => {-->
+<!--                    try {-->
+<!--                        const statusResp = await fetch(workflowUrl + '/status/' + eventId);-->
+<!--                        const data = await statusResp.json();-->
+
+<!--                        if (data.status !== 'SUBMITTED') {-->
+<!--                            clearInterval(pollInterval);-->
+<!--                            document.getElementById('status').innerText = data.status;-->
+<!--                            document.getElementById('category').innerText = data.category || 'N/A';-->
+<!--                            document.getElementById('priority').innerText = data.priority || 'N/A';-->
+<!--                            document.getElementById('note').innerText = data.note || '';-->
+<!--                        }-->
+<!--                    } catch (err) {-->
+<!--                        console.error('Polling error:', err);-->
+<!--                    }-->
+<!--                }, 2000);-->
+
+<!--            } catch (err) {-->
+<!--                alert('Submission failed. Please try again later.');-->
+<!--                console.error(err);-->
+<!--            }-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Campus Buzz - Submit Event</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 500px; }
+        input, textarea { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 20px; border: 1px solid #ccc; padding: 15px; display: none; }
+        .status { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Campus Buzz</h1>
+        <p>Submit a campus event. The system will automatically review and classify it.</p>
+        <form id="eventForm">
+            <input type="text" id="title" placeholder="Event Title *" required>
+            <textarea id="description" placeholder="Description (at least 40 characters) *" rows="4" required></textarea>
+            <input type="text" id="location" placeholder="Location *" required>
+            <input type="text" id="date" placeholder="Date (YYYY-MM-DD) *" required>
+            <input type="text" id="organizer" placeholder="Organizer *" required>
+            <button type="submit">Submit for Review</button>
+        </form>
+
+        <div id="result">
+            <h3>Review Result</h3>
+            <p><span class="status">Status:</span> <span id="status"></span></p>
+            <p><span class="status">Category:</span> <span id="category"></span></p>
+            <p><span class="status">Priority:</span> <span id="priority"></span></p>
+            <p><span class="status">Note:</span> <span id="note"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Determine workflow URL dynamically – no hardcoded address
+        let workflowUrl = "{{ workflow_url }}";
+        if (!workflowUrl) {
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            workflowUrl = `${protocol}//${hostname}:5002`;
+        }
+        console.log('Workflow URL:', workflowUrl);
+
+        document.getElementById('eventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                location: document.getElementById('location').value,
+                date: document.getElementById('date').value,
+                organizer: document.getElementById('organizer').value
+            };
+
+            try {
+                const submitResp = await fetch(workflowUrl + '/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                const submitData = await submitResp.json();
+                const eventId = submitData.event_id;
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+                document.getElementById('status').innerText = 'Processing...';
+                document.getElementById('category').innerText = '—';
+                document.getElementById('priority').innerText = '—';
+                document.getElementById('note').innerText = '—';
+
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const statusResp = await fetch(workflowUrl + '/status/' + eventId);
+                        const data = await statusResp.json();
+
+                        if (data.status !== 'SUBMITTED') {
+                            clearInterval(pollInterval);
+                            document.getElementById('status').innerText = data.status;
+                            document.getElementById('category').innerText = data.category || 'N/A';
+                            document.getElementById('priority').innerText = data.priority || 'N/A';
+                            document.getElementById('note').innerText = data.note || '';
+                        }
+                    } catch (err) {
+                        console.error('Polling error:', err);
+                    }
+                }, 2000);
+
+            } catch (err) {
+                alert('Submission failed. Please try again later.');
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
