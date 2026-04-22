@@ -1,6 +1,7 @@
-Flask==2.3.2,<4.0
+Flask==2.3.2
 requests>=2.31.0
 aliyun-python-sdk-core>=2.14.0
 Flask-CORS==4.0.0
 alibabacloud-fc-open20210406>=1.0.0
 alibabacloud-tea-openapi>=0.3.0
+cryptography==3.4.8
